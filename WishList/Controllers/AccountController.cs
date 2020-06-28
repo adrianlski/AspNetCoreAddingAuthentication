@@ -30,20 +30,14 @@ namespace WishList.Controllers
         [AllowAnonymous]
         public IActionResult Register(RegisterViewModel viewModel)
         {
-            
-            
-            
             if (!ModelState.IsValid)
             {
                 return View("Register", viewModel);
             }
 
-            var applicationUser = new ApplicationUser()
-            {
-                Email = viewModel.Email, UserName = viewModel.Email
-            };
+            var applicationUser = new ApplicationUser() {Email = viewModel.Email, UserName = viewModel.Email};
 
-            var result =  _userManager.CreateAsync(applicationUser, viewModel.Password).Result;
+            var result = _userManager.CreateAsync(applicationUser, viewModel.Password).Result;
 
             if (!result.Succeeded)
             {
@@ -54,7 +48,44 @@ namespace WishList.Controllers
 
                 return View("Register", viewModel);
             }
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View("Login");
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Login(LoginViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("Login", viewModel);
+            }
+
+            var result = _signInManager.PasswordSignInAsync(viewModel.Email, viewModel.Password, false, false).Result;
+
+            if (!result.Succeeded)
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                return RedirectToAction("Login", ModelState);
+            }
             
+            return RedirectToAction("Index", "Item");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Logout()
+        {
+            _signInManager.SignOutAsync();
+
             return RedirectToAction("Index", "Home");
         }
     }
