@@ -30,6 +30,9 @@ namespace WishList.Controllers
         [AllowAnonymous]
         public IActionResult Register(RegisterViewModel viewModel)
         {
+            
+            
+            
             if (!ModelState.IsValid)
             {
                 return View("Register", viewModel);
@@ -37,10 +40,10 @@ namespace WishList.Controllers
 
             var applicationUser = new ApplicationUser()
             {
-                Email = viewModel.Email, UserName = viewModel.Email, PasswordHash = viewModel.Password
+                Email = viewModel.Email, UserName = viewModel.Email
             };
 
-            var result =  _userManager.CreateAsync(applicationUser).Result;
+            var result =  _userManager.CreateAsync(applicationUser, viewModel.Password).Result;
 
             if (!result.Succeeded)
             {
